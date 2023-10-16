@@ -27,8 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
 // integers, an array of three integers, and a slice of integers.
@@ -41,6 +39,22 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        if tuple.0 > 255 || tuple.1 > 255 || tuple.2 > 255 {
+            return Err(IntoColorError::IntConversion);
+        }
+        if tuple.0 < 0 || tuple.1 < 0 || tuple.2 < 0 {
+            return Err(IntoColorError::IntConversion);
+        }
+
+        let r = tuple.0 as u8;
+        let g = tuple.1 as u8;
+        let b = tuple.2 as u8;
+
+        return Ok(Color {
+            red: r,
+            green: g,
+            blue: b,
+        });
     }
 }
 
@@ -48,6 +62,25 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let mut co = Color {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+        let mut c = 0;
+        for i in arr {
+            if i > 255 || i < 0 {
+                return Err(IntoColorError::IntConversion);
+            }
+            c += 1;
+            match c {
+                1 => co.red = i as u8,
+                2 => co.green = i as u8,
+                3 => co.blue = i as u8,
+                _ => return Err(IntoColorError::BadLen),
+            }
+        }
+        return Ok(co);
     }
 }
 
@@ -55,6 +88,28 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        let mut co = Color {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+        let mut c = 0;
+        for i in slice {
+            if *i > 255 || *i < 0 {
+                return Err(IntoColorError::IntConversion);
+            }
+            c += 1;
+            match c {
+                1 => co.red = *i as u8,
+                2 => co.green = *i as u8,
+                3 => co.blue = *i as u8,
+                _ => return Err(IntoColorError::BadLen),
+            }
+        }
+        if c != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        return Ok(co);
     }
 }
 
